@@ -22,19 +22,59 @@ for (let i = 0, cnt = cards.length; i < cnt; i++) {
 }
 
 let addBtn = document.querySelector("#add");
+
+let authBtn = document.querySelector("#auth");
+
 let popupForm = document.querySelector("#popup-form");
+
+let popupFormAuth = document.querySelector("#popup-form-auth");
+
 let closePopupForm = popupForm.querySelector(".popup-close");
+
+let closePopupFormAuth = popupFormAuth.querySelector(".popup-close-auth");
+
+//обработка события добавления котиков
 addBtn.addEventListener("click", (e) => {
+  if (!userInCookies()) {
+    alert('Вы не авторизованы!')
+    return
+  }
   e.preventDefault();
   if (!popupForm.classList.contains("active")) {
     popupForm.classList.add("active");
     popupForm.parentElement.classList.add("active");
   }
 });
+
+ function userInCookies() {
+  return Cookies.get('user') !== undefined;
+ }
+
+//открытие авторизации
+authBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  if (!popupFormAuth.classList.contains("active")) {
+    popupFormAuth.classList.add("active");
+    popupFormAuth.parentElement.classList.add("active");
+  }
+});
+
+
 closePopupForm.addEventListener("click", () => {
   popupForm.classList.remove("active");
   popupForm.parentElement.classList.remove("active");
 });
+
+//закрытие авторизации
+closePopupFormAuth.addEventListener("click", () => {
+  closeAuthPopup();
+});
+
+function closeAuthPopup() {
+  popupFormAuth.classList.remove("active");
+  popupFormAuth.parentElement.classList.remove("active");
+}
+
 
 const api = new Api("ibragimova-angelina");
 
@@ -92,6 +132,26 @@ form.addEventListener("submit", (e) => {
     }
   });
 });
+
+// обработка события войти
+let formAuth = document.forms[1];
+
+formAuth.addEventListener("submit", (e) => {
+  e.preventDefault();
+  let user = formAuth.elements['user'].value
+  let password = formAuth.elements['password'].value
+  Cookies.set('user', user)
+  Cookies.set('password', password)
+  closeAuthPopup();
+  authBtn.innerHTML = 'Добро пожаловать: ' + Cookies.get('user');
+});
+
+setInterval(() => {
+  if (userInCookies) {
+    authBtn.innerHTML = Cookies.get('user') !== undefined ? 'Добро пожаловать: ' + Cookies.get('user') : 'Авторизация';
+  }
+}, "200")
+
 
 const updCards = function (data) {
   main.innerHTML = "";
