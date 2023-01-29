@@ -202,25 +202,26 @@ const getCats = function (api, store) {
 };
 
 function displayOneCatInPopup(e) {
-  let cat = getCatByIdFromLocalStorage(e.target.id);
+  // let cat = getCatByIdFromLocalStorage(e.target.id);
+
+  api.getCat(e.target.id)
+  .then((res) => res.json())
+  .then(data => {
+    let cat = data.data
+    formEdit.firstElementChild.style.backgroundImage = `url(${cat.img_link})`
+    formEdit.elements['id'].setAttribute('value', cat.id)
+    formEdit.elements['age'].setAttribute('value', cat.age)
+    formEdit.elements['name'].setAttribute('value', cat.name)
+    formEdit.elements['rate'].setAttribute('value', cat.rate)
+    formEdit.elements['description'].value = cat.description
+    formEdit.elements['favourite'].checked = cat.favourite == true
+    formEdit.elements['img_link'].setAttribute('value', cat.img_link)
   
-  formEdit.firstElementChild.style.backgroundImage = `url(${cat.img_link})`
-  formEdit.elements['id'].setAttribute('value', cat.id)
-  formEdit.elements['age'].setAttribute('value', cat.age)
-  formEdit.elements['name'].setAttribute('value', cat.name)
-  formEdit.elements['rate'].setAttribute('value', cat.rate)
-  formEdit.elements['description'].value = cat.description
-  formEdit.elements['favourite'].checked = cat.favourite == true
-  formEdit.elements['img_link'].setAttribute('value', cat.img_link)
-
-  if (!popupInfoCat.classList.contains("active")) {
-    popupInfoCat.classList.add("active");
-    popupInfoCat.parentElement.classList.add("active");
-  }
-}
-
-function getCatByIdFromLocalStorage(id) {
-  return JSON.parse(localStorage.getItem('cats')).find(cat => cat.id == id)  
+    if (!popupInfoCat.classList.contains("active")) {
+      popupInfoCat.classList.add("active");
+      popupInfoCat.parentElement.classList.add("active");
+    }
+  })
 }
 
 getCats(api, catsData);
