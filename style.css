@@ -48,6 +48,10 @@ main {
   background-color: #aaa;
 }
 
+.auth {
+  padding: 5px;
+}
+
 @media (min-width: 768px) {
   main {
     grid-template-columns: repeat(3, 1fr);
