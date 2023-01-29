@@ -22,16 +22,19 @@ for (let i = 0, cnt = cards.length; i < cnt; i++) {
 }
 
 let addBtn = document.querySelector("#add");
-
 let authBtn = document.querySelector("#auth");
-
 let popupForm = document.querySelector("#popup-form");
 
 let popupFormAuth = document.querySelector("#popup-form-auth");
+let popupInfoCat = document.querySelector("#popup-info-cat");
 
 let closePopupForm = popupForm.querySelector(".popup-close");
-
 let closePopupFormAuth = popupFormAuth.querySelector(".popup-close-auth");
+let closePopupInfoCats = popupInfoCat.querySelector(".popup-close-info-cat")
+
+let form = document.forms[0]; // form add
+let formAuth = document.forms[1]; // form authorization
+let formEdit = document.forms[2]; // form edit
 
 //обработка события добавления котиков
 addBtn.addEventListener("click", (e) => {
@@ -65,6 +68,11 @@ closePopupForm.addEventListener("click", () => {
   popupForm.parentElement.classList.remove("active");
 });
 
+closePopupInfoCats.addEventListener("click", () => {
+  popupInfoCat.classList.remove("active");
+  popupInfoCat.parentElement.classList.remove("active");
+});
+
 //закрытие авторизации
 closePopupFormAuth.addEventListener("click", () => {
   closeAuthPopup();
@@ -78,7 +86,6 @@ function closeAuthPopup() {
 
 const api = new Api("ibragimova-angelina");
 
-let form = document.forms[0];
 form.img_link.addEventListener("change", (e) => {
   form.firstElementChild.style.backgroundImage = `url(${e.target.value})`;
 });
@@ -133,9 +140,6 @@ form.addEventListener("submit", (e) => {
   });
 });
 
-// обработка события войти
-let formAuth = document.forms[1];
-
 formAuth.addEventListener("submit", (e) => {
   e.preventDefault();
   let user = formAuth.elements['user'].value
@@ -157,7 +161,7 @@ const updCards = function (data) {
   main.innerHTML = "";
   data.forEach(function (cat) {
     if (cat.id) {
-      let card = `<div class="${
+      let card = `<div id="${cat.id}" class="${
         cat.favourite ? "card like" : "card"
       }" style="background-image:  url(${cat.img_link || "images/cat.jpg"})"> 
     <span>${cat.name}</span> 
@@ -191,6 +195,32 @@ const getCats = function (api, store) {
   } else {
     updCards(store);
   }
+  
+  for(i = 0; i < cards.length; i++) {
+    cards[i].addEventListener("click", displayOneCatInPopup)
+  }
 };
+
+function displayOneCatInPopup(e) {
+  let cat = getCatByIdFromLocalStorage(e.target.id);
+  
+  formEdit.firstElementChild.style.backgroundImage = `url(${cat.img_link})`
+  formEdit.elements['id'].setAttribute('value', cat.id)
+  formEdit.elements['age'].setAttribute('value', cat.age)
+  formEdit.elements['name'].setAttribute('value', cat.name)
+  formEdit.elements['rate'].setAttribute('value', cat.rate)
+  formEdit.elements['description'].value = cat.description
+  formEdit.elements['favourite'].checked = cat.favourite == true
+  formEdit.elements['img_link'].setAttribute('value', cat.img_link)
+
+  if (!popupInfoCat.classList.contains("active")) {
+    popupInfoCat.classList.add("active");
+    popupInfoCat.parentElement.classList.add("active");
+  }
+}
+
+function getCatByIdFromLocalStorage(id) {
+  return JSON.parse(localStorage.getItem('cats')).find(cat => cat.id == id)  
+}
 
 getCats(api, catsData);

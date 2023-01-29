@@ -87,6 +87,40 @@
       </div>
     </div>
 
+    <div class="popup-wrapper">
+      <div class="popup popup-edit" id="popup-info-cat">
+        <div class="popup-edit-btn btn"><a class="btn" href="" id="auth">Изменить</a></div>
+        <div class="popup-close-info-cat btn"><i class="fa-solid fa-xmark"></i></div>
+        <h2>Информация о коте</h2>
+        <form action="">
+          <div class="form-img form-img-edit" name="picture"></div>
+          <label for="id">ID</label>
+          <input type="number" name="id" disabled min="1" required placeholder="id" />
+          <label for="age">Возраст</label>
+          <input type="number" name="age" disabled placeholder="Возраст" />
+          <label for="name">Имя</label>
+          <input type="text" name="name" disabled required placeholder="Имя" />
+          <label>Рейтинг</label>
+          <input
+            type="number"
+            name="rate"
+            placeholder="Рейтинг (0-10)"
+            min="0"
+            max="10"
+            disabled
+          />
+          <label>Описание</label>
+          <textarea name="description" disabled placeholder="Описание"></textarea>
+          <label
+            >Любимчик <input type="checkbox" disabled name="favourite" placeholder=""
+          /></label>
+          <label>Ссылка</label>
+          <input type="text" name="img_link" disabled placeholder="Ссылка на фото" />
+          <button hidden type="submit">Сохранить</button>
+        </form>
+      </div>
+    </div>
+
     <script src="scripts/index.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.1/dist/js.cookie.min.js"></script>
   </body>

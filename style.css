@@ -144,15 +144,29 @@ main {
   position: relative;
   display: none;
 }
+
+.popup {
+  max-width: 900px;
+}
+
 .popup.active {
   display: block;
 }
-.popup-close, .popup-close-auth {
+.popup-close, .popup-close-auth, .popup-close-info-cat {
   width: max-content;
   position: absolute;
   top: 10px;
   right: 10px;
   cursor: pointer;
+}
+
+.popup-edit-btn {
+  width: max-content;
+  position: absolute;
+  top: 10px;
+  right: 50px;
+  cursor: pointer;
+  padding: 5px;
 }
 .popup h2 {
   margin: 0 0 20px;
@@ -177,6 +191,11 @@ form {
   box-shadow: 0 0 2px 0 #0004;
   background: url("images/cat.jpg") no-repeat center / cover;
 }
+
+.form-img-edit {
+  grid-row-end: span 7;
+}
+
 input,
 textarea {
   outline: none;
