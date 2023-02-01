@@ -168,6 +168,29 @@ main {
   cursor: pointer;
   padding: 5px;
 }
+
+.popup-delete-btn {
+  width: max-content;
+  position: absolute;
+  top: 10px;
+  right: 150px;
+  cursor: pointer;
+  padding: 5px;
+  background-color: red;
+}
+
+.popup-delete-btn:hover {
+  background-color: red;
+}
+
+#delete {
+  background-color: red;
+}
+
+#delete:hover {
+  background-color: red;
+}
+
 .popup h2 {
   margin: 0 0 20px;
   text-align: center;

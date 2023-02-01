@@ -87,9 +87,11 @@
       </div>
     </div>
 
+    <!-- info/edit popup -->
     <div class="popup-wrapper">
       <div class="popup popup-edit" id="popup-info-cat">
-        <div class="popup-edit-btn btn"><a class="btn" href="" id="auth">Изменить</a></div>
+        <div class="popup-delete-btn btn"><a class="btn" href="" id="delete">Удалить</a></div>
+        <div class="popup-edit-btn btn"><a class="btn" href="" id="edit">Изменить</a></div>
         <div class="popup-close-info-cat btn"><i class="fa-solid fa-xmark"></i></div>
         <h2>Информация о коте</h2>
         <form action="">
@@ -116,7 +118,7 @@
           /></label>
           <label>Ссылка</label>
           <input type="text" name="img_link" disabled placeholder="Ссылка на фото" />
-          <button hidden type="submit">Сохранить</button>
+          <button hidden name="edit_btn" type="submit">Сохранить</button>
         </form>
       </div>
     </div>

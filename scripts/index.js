@@ -1,30 +1,11 @@
-let main = document.querySelector("main");
-
-cats.forEach(function (cat) {
-  // let card = `<div class="card" style="background-image: url(${cat.img_link})">
-  // <span>${cat.name}</span>
-  // </div>`;
-
-  let card = `<div class="${
-    cat.favourite ? "card like" : "card"
-  }" style="background-image: url(${cat.img_link})">
-    <span>${cat.name}</span>
-    </div>`;
-
-  main.innerHTML += card;
-});
-
-let cards = document.getElementsByClassName("card");
-
-for (let i = 0, cnt = cards.length; i < cnt; i++) {
-  const width = cards[i].offsetWidth;
-  cards[i].style.height = width * 0.6 + "px";
-}
+const API = new Api("ibragimova-angelina");
 
 let addBtn = document.querySelector("#add");
 let authBtn = document.querySelector("#auth");
-let popupForm = document.querySelector("#popup-form");
+let editBtn = document.querySelector("#edit");
+let deleteBtn = document.querySelector("#delete")
 
+let popupForm = document.querySelector("#popup-form");
 let popupFormAuth = document.querySelector("#popup-form-auth");
 let popupInfoCat = document.querySelector("#popup-info-cat");
 
@@ -35,6 +16,30 @@ let closePopupInfoCats = popupInfoCat.querySelector(".popup-close-info-cat")
 let form = document.forms[0]; // form add
 let formAuth = document.forms[1]; // form authorization
 let formEdit = document.forms[2]; // form edit
+
+let main = document.querySelector("main");
+
+// cats.forEach(function (cat) {
+//   // let card = `<div class="card" style="background-image: url(${cat.img_link})">
+//   // <span>${cat.name}</span>
+//   // </div>`;
+
+//   let card = `<div class="${
+//     cat.favourite ? "card like" : "card"
+//   }" style="background-image: url(${cat.img_link})">
+//     <span>${cat.name}</span>
+//     </div>`;
+
+//   main.innerHTML += card;
+// });
+
+
+let cards = document.getElementsByClassName("card");
+
+for (let i = 0, cnt = cards.length; i < cnt; i++) {
+  const width = cards[i].offsetWidth;
+  cards[i].style.height = width * 0.6 + "px";
+}
 
 //обработка события добавления котиков
 addBtn.addEventListener("click", (e) => {
@@ -62,39 +67,60 @@ authBtn.addEventListener("click", (e) => {
   }
 });
 
+deleteBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  let body = getFormBody(formEdit);
+  console.log(body)
+  API.delCat(body.id)
+  .then((res) => res.json())
+  .then((data) => {
+    if (data.message === "ok") {
+      catsData = catsData.filter(cat => cat.id != body.id)
+      localStorage.setItem("cats", JSON.stringify(catsData));
+      getCats(API, catsData);  // получили всех котов
+      closePopup(popupInfoCat);
+    }
+  });
+})
+
+editBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  makeFormEditable(true)
+});
+
 
 closePopupForm.addEventListener("click", () => {
-  popupForm.classList.remove("active");
-  popupForm.parentElement.classList.remove("active");
+  closePopup(popupForm)
 });
 
 closePopupInfoCats.addEventListener("click", () => {
-  popupInfoCat.classList.remove("active");
-  popupInfoCat.parentElement.classList.remove("active");
+  closePopup(popupInfoCat)
 });
 
 //закрытие авторизации
 closePopupFormAuth.addEventListener("click", () => {
-  closeAuthPopup();
+  closePopup(popupFormAuth)
 });
 
-function closeAuthPopup() {
-  popupFormAuth.classList.remove("active");
-  popupFormAuth.parentElement.classList.remove("active");
+function closePopup(popup) {
+  popup.classList.remove("active");
+  popup.parentElement.classList.remove("active");
 }
-
-
-const api = new Api("ibragimova-angelina");
 
 form.img_link.addEventListener("change", (e) => {
   form.firstElementChild.style.backgroundImage = `url(${e.target.value})`;
 });
+formEdit.img_link.addEventListener("change", (e) => {
+  formEdit.firstElementChild.style.backgroundImage = `url(${e.target.value})`;
+});
 form.img_link.addEventListener("input", (e) => {
   form.firstElementChild.style.backgroundImage = `url(${e.target.value})`;
 });
+formEdit.img_link.addEventListener("input", (e) => {
+  formEdit.firstElementChild.style.backgroundImage = `url(${e.target.value})`;
+});
 
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
+function getFormBody(form) {
   let body = {};
   for (let i = 0; i < form.elements.length; i++) {
     let inp = form.elements[i];
@@ -108,31 +134,36 @@ form.addEventListener("submit", (e) => {
       }
     }
   }
+  return body;
+}
 
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  let body = getFormBody(form);
   console.log(body);
 
-  api
-  .addCat(body)
+  API
+  .addCat(body)   // добавили
   .then((res) => res.json())
   .then((data) => {
     if (data.message === "ok") {
       form.reset();
       closePopupForm.click();
-      api
-        .getCat(body.id)
+      API
+        .getCat(body.id) // получили
         .then((res) => res.json())
         .then((cat) => {
           if (cat.message === "ok") {
             catsData.push(cat.data);
             localStorage.setItem("cats", JSON.stringify(catsData));
-            getCats(api, catsData);
+            getCats(API, catsData);  // получили всех котов
           } else {
             console.log(cat);
           }
         });
     } else {
       console.log(data);
-      api
+      API
         .getIds()
         .then((r) => r.json())
         .then((d) => console.log(d));
@@ -146,14 +177,40 @@ formAuth.addEventListener("submit", (e) => {
   let password = formAuth.elements['password'].value
   Cookies.set('user', user)
   Cookies.set('password', password)
-  closeAuthPopup();
-  authBtn.innerHTML = 'Добро пожаловать: ' + Cookies.get('user');
+  closePopup(popupFormAuth);
 });
 
+formEdit.addEventListener("submit", (e) => {
+  e.preventDefault();
+  let body = getFormBody(formEdit);
+  API.updCat(body.id, body)
+  .then((res) => res.json())
+  .then((data) => {
+    if (data.message === "ok") {
+      console.log("Cat is updated.")
+      API
+        .getCat(body.id) // получили
+        .then((res) => res.json())
+        .then((cat) => {
+          if (cat.message === "ok") {
+            catsData = catsData.filter(cat => cat.id != body.id)
+            catsData.push(cat.data);
+            localStorage.setItem("cats", JSON.stringify(catsData));
+            getCats(API, catsData);  // получили всех котов
+            closePopup(popupInfoCat)
+          } else {
+            console.log(cat);
+          }
+        });
+      // TODO: add cat to localstorage for optimization
+    }
+  });
+})
+
 setInterval(() => {
-  if (userInCookies) {
-    authBtn.innerHTML = Cookies.get('user') !== undefined ? 'Добро пожаловать: ' + Cookies.get('user') : 'Авторизация';
-  }
+    authBtn.innerHTML = userInCookies()
+    ? 'Добро пожаловать: ' + Cookies.get('user')
+    : 'Авторизация';
 }, "200")
 
 
@@ -164,7 +221,7 @@ const updCards = function (data) {
       let card = `<div id="${cat.id}" class="${
         cat.favourite ? "card like" : "card"
       }" style="background-image:  url(${cat.img_link || "images/cat.jpg"})"> 
-    <span>${cat.name}</span> 
+    <span id="${cat.id}">${cat.name}</span> 
     </div>`;
       main.innerHTML += card;
     }
@@ -179,9 +236,9 @@ const updCards = function (data) {
 let catsData = localStorage.getItem("cats");
 catsData = catsData ? JSON.parse(catsData) : [];
 
-const getCats = function (api, store) {
+const getCats = function (API, store) {
   if (!store.length) {
-    api
+    API
       .getCats()
       .then((res) => res.json())
       .then((data) => {
@@ -190,21 +247,31 @@ const getCats = function (api, store) {
           localStorage.setItem("cats", JSON.stringify(data.data));
           catsData = [...data.data];
           updCards(data.data);
+          addOnClickToCard();
         }
       });
   } else {
     updCards(store);
-  }
-  
-  for(i = 0; i < cards.length; i++) {
-    cards[i].addEventListener("click", displayOneCatInPopup)
+    addOnClickToCard();
   }
 };
 
-function displayOneCatInPopup(e) {
-  // let cat = getCatByIdFromLocalStorage(e.target.id);
+function addOnClickToCard() {
+  for(i = 0; i < cards.length; i++) {
+    cards[i].addEventListener("click", displayOneCatInPopup)
+  }
+}
 
-  api.getCat(e.target.id)
+function displayOneCatInPopup(e) {
+  if (!userInCookies()) {
+    alert('Вы не авторизованы!')
+    return
+  }
+  makeFormEditable(false);
+  formEdit.reset();
+  console.log(e.target)
+  console.log(e.target.id)
+  API.getCat(e.target.id)
   .then((res) => res.json())
   .then(data => {
     let cat = data.data
@@ -224,4 +291,15 @@ function displayOneCatInPopup(e) {
   })
 }
 
-getCats(api, catsData);
+function makeFormEditable(value) {
+  value = !value
+  formEdit.elements['age'].disabled = value
+  formEdit.elements['name'].disabled = value
+  formEdit.elements['rate'].disabled = value
+  formEdit.elements['description'].disabled = value
+  formEdit.elements['favourite'].disabled = value
+  formEdit.elements['img_link'].disabled = value
+  formEdit.edit_btn.hidden = value;
+}
+
+getCats(API, catsData);
